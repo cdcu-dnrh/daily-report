@@ -352,16 +352,13 @@
         btnGroup.style.display = 'none';
         datePickerInput.style.display = 'none';
 
+        setTimeout(()=>{
+
         html2canvas(document.getElementById('reportContent'), { 
             scale: 2, 
             backgroundColor: "#ffffff",
             windowWidth: 800 
         }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `Daily_Report_${dateInput.value}.jpg`;
-            // แก้ไขจุดที่พิมพ์ผิดตรงนี้ครับ
-            link.href = canvas.toDataURL('image/jpeg', 0.9); 
-            link.click();
             
             const imgData = canvas.toDataURL("image/jpeg",0.9);
             window.open(imgData);
