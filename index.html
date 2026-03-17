@@ -246,7 +246,7 @@
     </div>
 
     <div class="button-group" id="btnGroup">
-        <button type="button" class="btn btn-print" onclick="window.print()">พิมพ์รายงาน</button>
+        <button type="button" class="btn btn-print" onclick="printReport()">พิมพ์รายงาน</button>
         <button type="button" class="btn btn-jpg" onclick="downloadJPG()">บันทึกเป็นรูปภาพ (JPG)</button>
     </div>
 
@@ -362,6 +362,10 @@
             // แก้ไขจุดที่พิมพ์ผิดตรงนี้ครับ
             link.href = canvas.toDataURL('image/jpeg', 0.9); 
             link.click();
+            
+            const imgData = canvas.toDataURL("image/jpeg",0.9);
+            window.open(imgData);
+            
             btnGroup.style.display = 'flex';
             datePickerInput.style.display = 'inline-block';
             Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
@@ -376,6 +380,12 @@
     document.addEventListener('keydown', e => {
         if (e.ctrlKey && (e.key === 'u' || e.key === 's' || (e.shiftKey && e.key === 'I')) || e.key === 'F12') e.preventDefault();
     });
+
+    function printReport(){
+    setTimeout(()=>{
+        window.print();
+    },200);
+}
 </script>
 
 </body>
