@@ -42,7 +42,7 @@
             color: #0c70d5; 
             text-align: center; 
             margin: 0 0 10px 0; 
-            font-size: 1.0rem; 
+            font-size: 1.2rem; 
             font-weight: 700; 
         }
 
@@ -54,7 +54,7 @@
             padding-bottom: 15px;
         }
         .date-display { 
-            font-size: 0.8rem; 
+            font-size: 1.1rem; 
             font-weight: bold; 
             display: block; 
             margin-bottom: 10px; 
@@ -113,15 +113,11 @@
 
         .total-lock {
             background-color: #e2e8f0;
-            color: #552bdf;
+            color: #000000;
         }
 
         .situation-container { margin-top: 20px; }
-        .situation-container label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: bold; 
-            font-size: 14px; }
+        .situation-container label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 16px; }
         .editable-textarea { 
             width: 100%; 
             min-height: 120px; 
@@ -136,7 +132,7 @@
         .footer-dept { 
             margin-top: 25px; 
             text-align: right; 
-            font-size: 12px; 
+            font-size: 14px; 
             color: #2d3748; 
             line-height: 1.6; 
             font-style: italic;
@@ -155,7 +151,7 @@
             border-radius: 8px; 
             cursor: pointer; 
             font-family: 'Sarabun', sans-serif; 
-            font-size: 16px; 
+            font-size: 14px; 
             font-weight: bold; 
             transition: 0.3s; 
             text-align: center; 
@@ -166,7 +162,7 @@
 
         @media (min-width: 600px) {
             .container { padding: 40px; }
-            h3 { font-size: 24px; }
+            h3 { font-size: 20px; }
             .button-group { flex-direction: row; }
             .cell-center { width: 120px; }
         }
@@ -246,7 +242,7 @@
     </div>
 
     <div class="button-group" id="btnGroup">
-        <button type="button" class="btn btn-print" onclick="printReport()">พิมพ์รายงาน</button>
+        <button type="button" class="btn btn-print" onclick="window.print()">พิมพ์รายงาน</button>
         <button type="button" class="btn btn-jpg" onclick="downloadJPG()">บันทึกเป็นรูปภาพ (JPG)</button>
     </div>
 
@@ -347,29 +343,50 @@
     });
 
     function downloadJPG() {
-        const btnGroup = document.getElementById('btnGroup');
-        const datePickerInput = document.getElementById('dateInput');
-        btnGroup.style.display = 'none';
-        datePickerInput.style.display = 'none';
+    const btnGroup = document.getElementById('btnGroup');
+    const datePickerInput = document.getElementById('dateInput');
+    
+    // แสดง Loading
+    Swal.fire({
+        title: 'กำลังสร้างรูปภาพ...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
 
-        setTimeout(()=>{
+    // ซ่อนปุ่มก่อนถ่ายรูป
+    btnGroup.style.display = 'none';
+    datePickerInput.style.display = 'none';
 
-        html2canvas(document.getElementById('reportContent'), { 
-            scale: 2, 
-            backgroundColor: "#ffffff",
-            windowWidth: 800 
-        }).then(canvas => {
-            
-            const imgData = canvas.toDataURL("image/jpeg",0.9);
-            window.open(imgData);
-            
-            btnGroup.style.display = 'flex';
-            datePickerInput.style.display = 'inline-block';
-            Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
+    html2canvas(document.getElementById('reportContent'), { 
+        scale: 3, // เพิ่มความชัด
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // คืนค่าปุ่ม
+        btnGroup.style.display = 'flex';
+        datePickerInput.style.display = 'inline-block';
+        Swal.close();
+
+        // แก้ปัญหาบนมือถือ: ใช้การแสดงรูปเพื่อให้กดค้างบันทึกแทน
+        Swal.fire({
+            title: 'สร้างรูปภาพสำเร็จ',
+            html: `
+                <p style="font-size:14px; color:red;">* สำหรับมือถือ: กดค้างที่รูปด้านล่างแล้วเลือก "บันทึกรูปภาพ" *</p>
+                <img src="${imgData}" style="width:100%; border:1px solid #ccc; margin-top:10px;">
+            `,
+            confirmButtonText: 'ปิดหน้าต่างนี้',
+            confirmButtonColor: '#2d3748',
+            width: '90%'
+        });
+
         }).catch(err => {
-            console.error(err);
-            btnGroup.style.display = 'flex';
-            datePickerInput.style.display = 'inline-block';
+        console.error(err);
+        btnGroup.style.display = 'flex';
+        datePickerInput.style.display = 'inline-block';
+        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างรูปภาพได้', 'error');
         });
     }
 
@@ -377,12 +394,6 @@
     document.addEventListener('keydown', e => {
         if (e.ctrlKey && (e.key === 'u' || e.key === 's' || (e.shiftKey && e.key === 'I')) || e.key === 'F12') e.preventDefault();
     });
-
-    function printReport(){
-    setTimeout(()=>{
-        window.print();
-    },200);
-}
 </script>
 
 </body>
