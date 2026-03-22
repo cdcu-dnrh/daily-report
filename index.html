@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สรุปรายงานการสอบสวนโรค++ (Daily Report)</title>
+    <title>สรุปรายงานการสอบสวนโรค (Thai Sarabun)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -89,7 +89,7 @@
         th, td { 
             border: 1px dashed #000;
             padding: 10px 8px; 
-            font-size: 14px; 
+            font-size: 15px; 
             line-height: 1.4;
         }
         th { 
@@ -151,7 +151,7 @@
             border-radius: 8px; 
             cursor: pointer; 
             font-family: 'Sarabun', sans-serif; 
-            font-size: 14px; 
+            font-size: 16px; 
             font-weight: bold; 
             transition: 0.3s; 
             text-align: center; 
@@ -162,7 +162,7 @@
 
         @media (min-width: 600px) {
             .container { padding: 40px; }
-            h3 { font-size: 20px; }
+            h3 { font-size: 24px; }
             .button-group { flex-direction: row; }
             .cell-center { width: 120px; }
         }
@@ -343,50 +343,28 @@
     });
 
     function downloadJPG() {
-    const btnGroup = document.getElementById('btnGroup');
-    const datePickerInput = document.getElementById('dateInput');
-    
-    // แสดง Loading
-    Swal.fire({
-        title: 'กำลังสร้างรูปภาพ...',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
+        const btnGroup = document.getElementById('btnGroup');
+        const datePickerInput = document.getElementById('dateInput');
+        btnGroup.style.display = 'none';
+        datePickerInput.style.display = 'none';
 
-    // ซ่อนปุ่มก่อนถ่ายรูป
-    btnGroup.style.display = 'none';
-    datePickerInput.style.display = 'none';
-
-    html2canvas(document.getElementById('reportContent'), { 
-        scale: 3, // เพิ่มความชัด
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 0.9);
-        
-        // คืนค่าปุ่ม
-        btnGroup.style.display = 'flex';
-        datePickerInput.style.display = 'inline-block';
-        Swal.close();
-
-        // แก้ปัญหาบนมือถือ: ใช้การแสดงรูปเพื่อให้กดค้างบันทึกแทน
-        Swal.fire({
-            title: 'สร้างรูปภาพสำเร็จ',
-            html: `
-                <p style="font-size:14px; color:red;">* สำหรับมือถือ: กดค้างที่รูปด้านล่างแล้วเลือก "บันทึกรูปภาพ" *</p>
-                <img src="${imgData}" style="width:100%; border:1px solid #ccc; margin-top:10px;">
-            `,
-            confirmButtonText: 'ปิดหน้าต่างนี้',
-            confirmButtonColor: '#2d3748',
-            width: '90%'
-        });
-
+        html2canvas(document.getElementById('reportContent'), { 
+            scale: 2, 
+            backgroundColor: "#ffffff",
+            windowWidth: 800 
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Daily_Report_${dateInput.value}.jpg`;
+            // แก้ไขจุดที่พิมพ์ผิดตรงนี้ครับ
+            link.href = canvas.toDataURL('image/jpeg', 0.9); 
+            link.click();
+            btnGroup.style.display = 'flex';
+            datePickerInput.style.display = 'inline-block';
+            Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
         }).catch(err => {
-        console.error(err);
-        btnGroup.style.display = 'flex';
-        datePickerInput.style.display = 'inline-block';
-        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างรูปภาพได้', 'error');
+            console.error(err);
+            btnGroup.style.display = 'flex';
+            datePickerInput.style.display = 'inline-block';
         });
     }
 
