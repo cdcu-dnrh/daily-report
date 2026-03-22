@@ -2,226 +2,399 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Report - Epidemiology</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปรายงานการสอบสวนโรค++ (Daily Report)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-   
+    
     <style>
-        :root { --primary: #2c3e50; --border: #cbd5e0; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; padding: 10px; margin: 0; }
-        .container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 800px; margin: auto; }
-        h3 { color: #0c70d5; text-align: center; margin: 0 0 10px; font-size: 1.1rem; }
-        hr { border: 0; border-top: 2px solid var(--primary); margin-bottom: 15px; }
-        .date-picker-container { text-align: center; margin-bottom: 15px; }
-        input[type="date"] { font-family: 'Sarabun'; padding: 8px; border: 1px solid var(--border); border-radius: 6px; width: 160px; text-align: center; }
-       
-        .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 15px; border: 1.5px solid #000; }
-        table { width: 100%; border-collapse: collapse; min-width: 300px; }
-        th, td { border: 1px dashed #000; padding: 10px 5px; font-size: 14px; }
-        th { background-color: #c4e0f1; }
-        .cell-input { outline: none; background: #fff; min-height: 25px; }
-        .cell-center { text-align: center; font-weight: bold; width: 85px; }
-        .summary-row { background-color: #f1f5f9; font-weight: bold; }
-       
-        .situation-container { margin-top: 15px; }
-        .editable-textarea { width: 100%; min-height: 100px; padding: 10px; border: 1.5px dashed #000; outline: none; font-size: 14px; white-space: pre-wrap; }
-        .footer-dept { margin-top: 20px; text-align: right; font-size: 12px; font-style: italic; color: #555; }
-       
-        .button-group { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 20px; }
-        .btn { padding: 14px; border-radius: 8px; cursor: pointer; font-family: 'Sarabun'; font-size: 14px; font-weight: bold; border: none; }
-        .btn-jpg { background: #2d3748; color: white; }
-        .btn-pdf { background: #e53e3e; color: white; }
-        .btn-print { background: #edf2f7; color: #2d3748; border: 1px solid #cbd5e0; }
-        @media (min-width: 600px) { .button-group { grid-template-columns: 1fr 1fr 1fr; } }
-       
-        .swal-image-custom { width: 100%; max-height: 60vh; object-fit: contain; border: 2px solid #333; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+        :root { 
+            --primary: #2c3e50; 
+            --accent: #3498db;
+            --border: #cbd5e0;
+            --header-bg: #f8fafc;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex; 
+            justify-content: center; 
+            padding: 10px; 
+            margin: 0; 
+        }
+
+        .container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 800px; 
+            border: 1px solid #e1e4e8; 
+            position: relative;
+        }
+
+        h3 { 
+            color: #0c70d5; 
+            text-align: center; 
+            margin: 0 0 10px 0; 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+        }
+
+        hr { border: 0; border-top: 2px solid var(--primary); margin-bottom: 20px; }
+
+        .date-picker-container { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            padding-bottom: 15px;
+        }
+        .date-display { 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            display: block; 
+            margin-bottom: 10px; 
+            color: #1a202c; }
+        
+        input[type="date"] {
+            font-family: 'Sarabun', sans-serif;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            width: 100%;
+            max-width: 150px;
+            outline: none;            
+            text-align: center;
+            justify-content: center;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px; 
+            background: white;
+            min-width: 275px; 
+            border: 1.5px solid #000;
+        }
+        th, td { 
+            border: 1px dashed #000;
+            padding: 10px 8px; 
+            font-size: 14px; 
+            line-height: 1.4;
+        }
+        th { 
+            background-color: #c4e0f1;
+            text-align: center; 
+            font-weight: 700;
+        }
+        .cell-input { 
+            outline: none; 
+            transition: background 0.2s; 
+        }
+        .cell-input:focus { 
+            background: #fffdf2 !important; 
+        }
+        .cell-center { text-align: center; font-weight: bold; width: 80px; }
+        
+        .summary-row { 
+            background-color: #f1f5f9;             
+            font-weight: bold; 
+        }
+
+        .total-lock {
+            background-color: #e2e8f0;
+            color: #000000;
+        }
+
+        .situation-container { margin-top: 20px; }
+        .situation-container label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 16px; }
+        .editable-textarea { 
+            width: 100%; 
+            min-height: 120px; 
+            padding: 12px; 
+            border: 1.5px dashed #000;
+            box-sizing: border-box; 
+            white-space: pre-wrap; 
+            outline: none;
+            font-size: 15px;
+        }
+
+        .footer-dept { 
+            margin-top: 25px; 
+            text-align: right; 
+            font-size: 14px; 
+            color: #2d3748; 
+            line-height: 1.6; 
+            font-style: italic;
+        }
+
+        .button-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin-top: 25px; 
+        }
+        
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-family: 'Sarabun', sans-serif; 
+            font-size: 14px; 
+            font-weight: bold; 
+            transition: 0.3s; 
+            text-align: center; 
+            border: none; 
+        }
+        .btn-print { background-color: #edf2f7; color: #2d3748; border: 1px solid #cbd5e0; }
+        .btn-jpg { background-color: #2d3748; color: white; }
+
+        @media (min-width: 600px) {
+            .container { padding: 40px; }
+            h3 { font-size: 20px; }
+            .button-group { flex-direction: row; }
+            .cell-center { width: 120px; }
+        }
+
+        @media print { 
+            .button-group, #dateInput { display: none !important; } 
+            body { background: white; padding: 0; } 
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; } 
+        }
+
     </style>
 </head>
 <body>
+
 <div class="container" id="reportContent">
     <h3>📝 สรุปรายงานการสอบสวนโรค (Daily Report)</h3>
     <hr>
+    
     <div class="date-picker-container">
-        <b id="thaiDateDisplay">ประจำวันที่...</b><br>
+        <span class="date-display" id="thaiDateDisplay">ประจำวันที่...</span>
         <input type="date" id="dateInput">
     </div>
+
     <div class="table-responsive">
         <table>
-            <thead><tr><th>รายการสอบสวนโรค</th><th>จำนวน (ราย)</th></tr></thead>
-            <tbody>
-                <tr><td>• เคสผู้ป่วยนอก (OPD)</td><td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="opd"></td></tr>
-                <tr><td>• เคสผู้ป่วยใน (IPD)</td><td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="ipd"></td></tr>
-                <tr><td>• เคสที่ Round Ward (IPD)</td><td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="round"></td></tr>
-                <tr><td>• บันทึกผ่าน D506</td><td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="d506"></td></tr>
-                <tr><td>• รายงานลงสู่ชุมชน</td><td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="community"></td></tr>
-                <tr><td>• รายงานเฉพาะราย</td><td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="investigation"></td></tr>
-                <tr class="summary-row"><td><strong>รวม (OPD+IPD)</strong></td><td class="cell-center" id="totalCell">0</td></tr>
+            <thead>
+                <tr>
+                    <th>รายการสอบสวนโรค</th>
+                    <th>จำนวน (ราย)</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td>• จำนวนเคสผู้ป่วยนอก (OPD)</td>
+                    <td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="opd"></td>
+                </tr>
+                <tr>
+                    <td>• จำนวนเคสผู้ป่วยใน (IPD)</td>
+                    <td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="ipd"></td>
+                </tr>
+                <tr>
+                    <td>• จำนวนเคสที่ Round Ward (IPD)</td>
+                    <td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="round"></td>
+                </tr>
+                <tr>
+                    <td>• จำนวน Record ที่บันทึกผ่าน D506</td>
+                    <td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="d506"></td>
+                </tr>
+                <tr>
+                    <td>• จำนวนเคสที่รายงานลงสู่ชุมชน</td>
+                    <td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="community"></td>
+                </tr>
+                <tr>
+                    <td>• จัดทำรายงานสอบสวนโรคเฉพาะราย</td>
+                    <td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="investigation"></td>
+                </tr>
+                <tr class="summary-row">
+                    <td><strong>สรุป จำนวนรายงานโรคประจำวัน </strong></td>
+                    <td class="cell-input cell-center total-lock" contenteditable="false" data-key="total">0</td>
+                </tr>
+
             </tbody>
         </table>
     </div>
+
     <div class="situation-container">
-        <b>สรุปสถานการณ์ประจำวัน :</b>
-        <div class="editable-textarea cell-input" contenteditable="true" data-key="situation"></div>
+        <label>สรุปรายงานสถานการณ์ประจำวัน :</label>
+        <div class="editable-textarea cell-input" 
+            contenteditable="true" 
+            data-key="situation" 
+            placeholder="ระบุรายละเอียดสถานการณ์วันนี้..."></div>
     </div>
+
     <div class="footer-dept">
-        <b>งานป้องกันควบคุมโรคและระบาดวิทยา</b><br>
+        <strong>งานป้องกันควบคุมโรคและระบาดวิทยา</strong> <br>
         โรงพยาบาลเทพรัตน์นครราชสีมา
     </div>
+
     <div class="button-group" id="btnGroup">
-        <button class="btn btn-print" onclick="window.print()">พิมพ์ / PDF</button>
-        <button class="btn btn-jpg" onclick="downloadJPG()">บันทึกเป็นรูปภาพ (JPG)</button>
-        <button class="btn btn-pdf" onclick="downloadPDF()">บันทึกเป็นไฟล์ PDF</button>
+        <button type="button" class="btn btn-print" onclick="window.print()">พิมพ์รายงาน</button>
+        <button type="button" class="btn btn-jpg" onclick="downloadJPG()">บันทึกเป็นรูปภาพ (JPG)</button>
     </div>
+
 </div>
 
 <script>
     const dateInput = document.getElementById('dateInput');
     const editableCells = document.querySelectorAll('.cell-input');
-    
+    const firstCell = document.querySelector('[data-key="opd"]');
+
     window.onload = () => {
-        dateInput.value = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
         updateThaiDate();
         loadData();
+        setTimeout(() => {
+            firstCell.focus();
+            selectText(firstCell);
+        }, 300);
     };
 
     function updateThaiDate() {
         const date = new Date(dateInput.value);
-        document.getElementById('thaiDateDisplay').innerText = 
-            "ประจำวันที่ " + date.toLocaleDateString('th-TH', {day:'numeric', month:'long', year:'numeric'});
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('thaiDateDisplay').innerText = "ประจำวันที่ " + date.toLocaleDateString('th-TH', options);
+    }
+
+    function selectText(element) {
+        if (!element.innerText.trim()) return;
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
     }
 
     function calculateTotal() {
-        const opd = parseInt(document.querySelector('[data-key="opd"]').innerText) || 0;
-        const ipd = parseInt(document.querySelector('[data-key="ipd"]').innerText) || 0;
-        document.getElementById('totalCell').innerText = (opd + ipd).toLocaleString();
+        const opdValue = parseInt(document.querySelector('[data-key="opd"]').innerText.replace(/,/g, '')) || 0;
+        const ipdValue = parseInt(document.querySelector('[data-key="ipd"]').innerText.replace(/,/g, '')) || 0;
+        const total = opdValue + ipdValue;
+        document.querySelector('[data-key="total"]').innerText = total;
     }
 
     function saveData() {
         const data = {};
-        editableCells.forEach(c => data[c.dataset.key] = c.innerText.trim());
-        localStorage.setItem('rep_' + dateInput.value, JSON.stringify(data));
+        editableCells.forEach(cell => {
+            data[cell.dataset.key] = cell.innerText;
+        });
+        localStorage.setItem('report_data_' + dateInput.value, JSON.stringify(data));
     }
 
     function loadData() {
-        const data = JSON.parse(localStorage.getItem('rep_' + dateInput.value) || '{}');
-        editableCells.forEach(c => {
-            c.innerText = data[c.dataset.key] || "";
-        });
+        const savedData = localStorage.getItem('report_data_' + dateInput.value);
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            editableCells.forEach(cell => {
+                cell.innerText = data[cell.dataset.key] !== undefined ? data[cell.dataset.key] : "";
+            });
+        } else {
+            editableCells.forEach(cell => cell.innerText = "");
+        }
         calculateTotal();
     }
 
-    dateInput.onchange = () => { updateThaiDate(); loadData(); };
-    editableCells.forEach(c => c.oninput = () => { calculateTotal(); saveData(); });
+    dateInput.addEventListener('change', () => { 
+        updateThaiDate(); 
+        loadData(); 
+        setTimeout(() => {
+            firstCell.focus();
+            selectText(firstCell);
+        }, 100);
+    });
 
-    async function downloadJPG() {
-        Swal.fire({ 
-            title: 'กำลังสร้างรูปภาพ...', 
-            allowOutsideClick: false, 
-            didOpen: () => Swal.showLoading() 
+    editableCells.forEach(cell => {
+        cell.addEventListener('focus', () => {
+            setTimeout(() => selectText(cell), 10);
         });
 
-        const btnGroup = document.getElementById('btnGroup');
-        btnGroup.style.display = 'none';
-
-        try {
-            const canvas = await html2canvas(document.getElementById('reportContent'), {
-                scale: 2.5,          // ปรับให้คมชัดแต่ไม่หนักเกินมือถือ
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            });
-
-            // ใช้ Blob + createObjectURL (ดีกว่า data URL สำหรับ LINE บางเวอร์ชัน)
-            canvas.toBlob((blob) => {
-                if (!blob) throw new Error('Blob creation failed');
-
-                const blobUrl = URL.createObjectURL(blob);
-
-                btnGroup.style.display = 'grid';
-                Swal.close();
-
-                Swal.fire({
-                    title: 'สร้างรูปภาพสำเร็จแล้ว!',
-                    html: `
-                        <div style="text-align:left; font-size:15px; color:#d32f2f; margin-bottom:15px; background:#fff3cd; padding:15px; border-radius:8px; line-height:1.5;">
-                            <b>⚠️ สำคัญ: ใน LINE มักกดค้างแล้วบันทึกไม่ได้</b><br><br>
-                            <b>วิธีที่ดีที่สุด (ทำตามนี้เลย):</b><br>
-                            1. กด ⋮ (สามจุด) หรือไอคอนแชร์มุมขวาบนของ LINE<br>
-                            2. เลือก <b>"เปิดด้วยเบราว์เซอร์อื่น"</b> หรือ <b>"Open in Chrome / Safari"</b><br>
-                            3. พอเปิดใน Chrome/Safari → กดค้างที่รูป → เลือก "บันทึกรูปภาพ" ได้ทันที 100%<br><br>
-                            หรือถ้าอยากลองใน LINE: กดค้างรูปด้านล่างแล้วดูว่ามีเมนู "บันทึกรูปภาพ" ไหม (บางเครื่องเวิร์ค)
-                        </div>
-                        <img src="${blobUrl}" class="swal-image-custom">
-                    `,
-                    confirmButtonText: 'เข้าใจแล้ว ปิด',
-                    confirmButtonColor: '#2c3e50',
-                    width: '95%',
-                    allowOutsideClick: true
-                }).then(() => {
-                    // คืน URL blob หลัง Swal ปิด (ป้องกัน memory leak)
-                    URL.revokeObjectURL(blobUrl);
-                });
-            }, 'image/jpeg', 0.92);
-
-        } catch (e) {
-            console.error(e);
-            btnGroup.style.display = 'grid';
-            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างรูปได้ กรุณาลองใหม่', 'error');
-        }
-    }
-
-    async function downloadPDF() {
-        Swal.fire({ 
-            title: 'กำลังสร้าง PDF...', 
-            allowOutsideClick: false, 
-            didOpen: () => Swal.showLoading() 
+        cell.addEventListener('input', () => {
+            if (cell.dataset.key === 'opd' || cell.dataset.key === 'ipd') calculateTotal();
+            saveData();
         });
 
-        const btnGroup = document.getElementById('btnGroup');
-        btnGroup.style.display = 'none';
-
-        try {
-            const canvas = await html2canvas(document.getElementById('reportContent'), { 
-                scale: 2,
-                useCORS: true 
-            });
-            const imgData = canvas.toDataURL('image/png');
-
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-            const blob = pdf.output('blob');
-            const url = URL.createObjectURL(blob);
-
-            btnGroup.style.display = 'grid';
-            Swal.close();
-
-            // เปิด PDF (LINE มักให้เลือกเปิดด้วยเบราว์เซอร์อื่น)
-            const newWindow = window.open(url, '_blank');
-            if (!newWindow) {
-                Swal.fire({
-                    title: 'เปิด PDF ไม่ได้อัตโนมัติ',
-                    text: 'กรุณากด "เปิดด้วยเบราว์เซอร์อื่น" ที่มุมขวาบนของ LINE หรือคัดลอกลิงก์แล้วเปิดใน Chrome',
-                    icon: 'info',
-                    confirmButtonText: 'ตกลง'
-                });
+        cell.addEventListener('keydown', (e) => {
+            if (e.key === "Enter") {
+                if (!cell.classList.contains('editable-textarea')) {
+                    e.preventDefault();
+                    const cells = Array.from(document.querySelectorAll('.cell-center[contenteditable="true"]'));
+                    const index = cells.indexOf(cell);
+                    if (index < cells.length - 1) {
+                        cells[index + 1].focus();
+                    } else {
+                        document.querySelector('.editable-textarea').focus();
+                    }
+                }
             }
+        });
+    });
 
-        } catch (e) {
-            console.error(e);
-            btnGroup.style.display = 'grid';
-            Swal.fire('ผิดพลาด', 'ไม่สามารถสร้าง PDF ได้ กรุณาลองใหม่', 'error');
-        }
+    function downloadJPG() {
+    const btnGroup = document.getElementById('btnGroup');
+    const datePickerInput = document.getElementById('dateInput');
+    
+    // แสดง Loading
+    Swal.fire({
+        title: 'กำลังสร้างรูปภาพ...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+
+    // ซ่อนปุ่มก่อนถ่ายรูป
+    btnGroup.style.display = 'none';
+    datePickerInput.style.display = 'none';
+
+    html2canvas(document.getElementById('reportContent'), { 
+        scale: 3, // เพิ่มความชัด
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // คืนค่าปุ่ม
+        btnGroup.style.display = 'flex';
+        datePickerInput.style.display = 'inline-block';
+        Swal.close();
+
+        // แก้ปัญหาบนมือถือ: ใช้การแสดงรูปเพื่อให้กดค้างบันทึกแทน
+        Swal.fire({
+            title: 'สร้างรูปภาพสำเร็จ',
+            html: `
+                <p style="font-size:14px; color:red;">* สำหรับมือถือ: กดค้างที่รูปด้านล่างแล้วเลือก "บันทึกรูปภาพ" *</p>
+                <img src="${imgData}" style="width:100%; border:1px solid #ccc; margin-top:10px;">
+            `,
+            confirmButtonText: 'ปิดหน้าต่างนี้',
+            confirmButtonColor: '#2d3748',
+            width: '90%'
+        });
+
+        }).catch(err => {
+        console.error(err);
+        btnGroup.style.display = 'flex';
+        datePickerInput.style.display = 'inline-block';
+        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างรูปภาพได้', 'error');
+        });
     }
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && (e.key === 'u' || e.key === 's' || (e.shiftKey && e.key === 'I')) || e.key === 'F12') e.preventDefault();
+    });
 </script>
+
 </body>
 </html>
