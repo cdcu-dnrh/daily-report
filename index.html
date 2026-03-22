@@ -2,14 +2,14 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daily Report - Epidemiology</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
-    
+   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+   
     <style>
         :root { --primary: #2c3e50; --border: #cbd5e0; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -19,8 +19,7 @@
         hr { border: 0; border-top: 2px solid var(--primary); margin-bottom: 15px; }
         .date-picker-container { text-align: center; margin-bottom: 15px; }
         input[type="date"] { font-family: 'Sarabun'; padding: 8px; border: 1px solid var(--border); border-radius: 6px; width: 160px; text-align: center; }
-        
-        /* Table Style */
+       
         .table-responsive { width: 100%; overflow-x: auto; margin-bottom: 15px; border: 1.5px solid #000; }
         table { width: 100%; border-collapse: collapse; min-width: 300px; }
         th, td { border: 1px dashed #000; padding: 10px 5px; font-size: 14px; }
@@ -28,26 +27,22 @@
         .cell-input { outline: none; background: #fff; min-height: 25px; }
         .cell-center { text-align: center; font-weight: bold; width: 85px; }
         .summary-row { background-color: #f1f5f9; font-weight: bold; }
-        
+       
         .situation-container { margin-top: 15px; }
         .editable-textarea { width: 100%; min-height: 100px; padding: 10px; border: 1.5px dashed #000; outline: none; font-size: 14px; white-space: pre-wrap; }
         .footer-dept { margin-top: 20px; text-align: right; font-size: 12px; font-style: italic; color: #555; }
-        
-        /* Button Style */
+       
         .button-group { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 20px; }
         .btn { padding: 14px; border-radius: 8px; cursor: pointer; font-family: 'Sarabun'; font-size: 14px; font-weight: bold; border: none; }
         .btn-jpg { background: #2d3748; color: white; }
         .btn-pdf { background: #e53e3e; color: white; }
         .btn-print { background: #edf2f7; color: #2d3748; border: 1px solid #cbd5e0; }
-
         @media (min-width: 600px) { .button-group { grid-template-columns: 1fr 1fr 1fr; } }
-        
-        /* SweetAlert Custom Image */
-        .swal-image-custom { width: 100%; border: 2px solid #333; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+       
+        .swal-image-custom { width: 100%; max-height: 60vh; object-fit: contain; border: 2px solid #333; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
     </style>
 </head>
 <body>
-
 <div class="container" id="reportContent">
     <h3>📝 สรุปรายงานการสอบสวนโรค (Daily Report)</h3>
     <hr>
@@ -55,7 +50,6 @@
         <b id="thaiDateDisplay">ประจำวันที่...</b><br>
         <input type="date" id="dateInput">
     </div>
-
     <div class="table-responsive">
         <table>
             <thead><tr><th>รายการสอบสวนโรค</th><th>จำนวน (ราย)</th></tr></thead>
@@ -70,17 +64,14 @@
             </tbody>
         </table>
     </div>
-
     <div class="situation-container">
         <b>สรุปสถานการณ์ประจำวัน :</b>
         <div class="editable-textarea cell-input" contenteditable="true" data-key="situation"></div>
     </div>
-
     <div class="footer-dept">
         <b>งานป้องกันควบคุมโรคและระบาดวิทยา</b><br>
         โรงพยาบาลเทพรัตน์นครราชสีมา
     </div>
-
     <div class="button-group" id="btnGroup">
         <button class="btn btn-print" onclick="window.print()">พิมพ์ / PDF</button>
         <button class="btn btn-jpg" onclick="downloadJPG()">บันทึกเป็นรูปภาพ (JPG)</button>
@@ -91,7 +82,7 @@
 <script>
     const dateInput = document.getElementById('dateInput');
     const editableCells = document.querySelectorAll('.cell-input');
-
+    
     window.onload = () => {
         dateInput.value = new Date().toISOString().split('T')[0];
         updateThaiDate();
@@ -100,7 +91,8 @@
 
     function updateThaiDate() {
         const date = new Date(dateInput.value);
-        document.getElementById('thaiDateDisplay').innerText = "ประจำวันที่ " + date.toLocaleDateString('th-TH', {day:'numeric', month:'long', year:'numeric'});
+        document.getElementById('thaiDateDisplay').innerText = 
+            "ประจำวันที่ " + date.toLocaleDateString('th-TH', {day:'numeric', month:'long', year:'numeric'});
     }
 
     function calculateTotal() {
@@ -111,13 +103,15 @@
 
     function saveData() {
         const data = {};
-        editableCells.forEach(c => data[c.dataset.key] = c.innerText);
+        editableCells.forEach(c => data[c.dataset.key] = c.innerText.trim());
         localStorage.setItem('rep_' + dateInput.value, JSON.stringify(data));
     }
 
     function loadData() {
         const data = JSON.parse(localStorage.getItem('rep_' + dateInput.value) || '{}');
-        editableCells.forEach(c => c.innerText = data[c.dataset.key] || "");
+        editableCells.forEach(c => {
+            c.innerText = data[c.dataset.key] || "";
+        });
         calculateTotal();
     }
 
@@ -125,61 +119,107 @@
     editableCells.forEach(c => c.oninput = () => { calculateTotal(); saveData(); });
 
     async function downloadJPG() {
-        Swal.fire({ title: 'กำลังสร้างรูปภาพ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ 
+            title: 'กำลังสร้างรูปภาพ...', 
+            allowOutsideClick: false, 
+            didOpen: () => Swal.showLoading() 
+        });
+
         const btnGroup = document.getElementById('btnGroup');
         btnGroup.style.display = 'none';
 
         try {
-            const canvas = await html2canvas(document.getElementById('reportContent'), { scale: 3, useCORS: true });
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-            btnGroup.style.display = 'grid';
-            Swal.close();
-
-            // แจ้งเตือนผู้ใช้ LINE ให้บันทึกเอง
-            Swal.fire({
-                title: 'สร้างรูปสำเร็จ!',
-                html: `
-                    <div style="text-align:left; font-size:14px; color:#d32f2f; margin-bottom:10px; background:#fff3cd; padding:10px; border-radius:5px;">
-                        <b>⚠️ สำหรับผู้ใช้ LINE:</b><br>
-                        1. <b>กดค้าง</b> ที่รูปภาพด้านล่าง<br>
-                        2. เลือกเมนู <b>"บันทึกรูปภาพ"</b> หรือ <b>"Save Image"</b>
-                    </div>
-                    <img src="${imgData}" class="swal-image-custom">
-                `,
-                confirmButtonText: 'ปิด',
-                confirmButtonColor: '#2c3e50',
-                width: '95%'
+            const canvas = await html2canvas(document.getElementById('reportContent'), {
+                scale: 2.5,          // ปรับให้คมชัดแต่ไม่หนักเกินมือถือ
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
             });
+
+            // ใช้ Blob + createObjectURL (ดีกว่า data URL สำหรับ LINE บางเวอร์ชัน)
+            canvas.toBlob((blob) => {
+                if (!blob) throw new Error('Blob creation failed');
+
+                const blobUrl = URL.createObjectURL(blob);
+
+                btnGroup.style.display = 'grid';
+                Swal.close();
+
+                Swal.fire({
+                    title: 'สร้างรูปภาพสำเร็จแล้ว!',
+                    html: `
+                        <div style="text-align:left; font-size:15px; color:#d32f2f; margin-bottom:15px; background:#fff3cd; padding:15px; border-radius:8px; line-height:1.5;">
+                            <b>⚠️ สำคัญ: ใน LINE มักกดค้างแล้วบันทึกไม่ได้</b><br><br>
+                            <b>วิธีที่ดีที่สุด (ทำตามนี้เลย):</b><br>
+                            1. กด ⋮ (สามจุด) หรือไอคอนแชร์มุมขวาบนของ LINE<br>
+                            2. เลือก <b>"เปิดด้วยเบราว์เซอร์อื่น"</b> หรือ <b>"Open in Chrome / Safari"</b><br>
+                            3. พอเปิดใน Chrome/Safari → กดค้างที่รูป → เลือก "บันทึกรูปภาพ" ได้ทันที 100%<br><br>
+                            หรือถ้าอยากลองใน LINE: กดค้างรูปด้านล่างแล้วดูว่ามีเมนู "บันทึกรูปภาพ" ไหม (บางเครื่องเวิร์ค)
+                        </div>
+                        <img src="${blobUrl}" class="swal-image-custom">
+                    `,
+                    confirmButtonText: 'เข้าใจแล้ว ปิด',
+                    confirmButtonColor: '#2c3e50',
+                    width: '95%',
+                    allowOutsideClick: true
+                }).then(() => {
+                    // คืน URL blob หลัง Swal ปิด (ป้องกัน memory leak)
+                    URL.revokeObjectURL(blobUrl);
+                });
+            }, 'image/jpeg', 0.92);
+
         } catch (e) {
+            console.error(e);
             btnGroup.style.display = 'grid';
-            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างรูปได้', 'error');
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างรูปได้ กรุณาลองใหม่', 'error');
         }
     }
 
     async function downloadPDF() {
-        Swal.fire({ title: 'กำลังเตรียมไฟล์ PDF...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ 
+            title: 'กำลังสร้าง PDF...', 
+            allowOutsideClick: false, 
+            didOpen: () => Swal.showLoading() 
+        });
+
         const btnGroup = document.getElementById('btnGroup');
         btnGroup.style.display = 'none';
 
         try {
-            const canvas = await html2canvas(document.getElementById('reportContent'), { scale: 2 });
+            const canvas = await html2canvas(document.getElementById('reportContent'), { 
+                scale: 2,
+                useCORS: true 
+            });
             const imgData = canvas.toDataURL('image/png');
+
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const width = pdf.internal.pageSize.getWidth();
-            const height = (canvas.height * width) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-            
-            // ใช้ Blob เพื่อส่งไฟล์ให้ LINE พยายามเปิด
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
             const blob = pdf.output('blob');
             const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            
+
             btnGroup.style.display = 'grid';
-            Swal.fire('คำแนะนำ', 'หากไฟล์ไม่โหลดอัตโนมัติ ให้เลือกเมนู "เปิดด้วยเบราว์เซอร์อื่น" ที่มุมขวาบนของ LINE', 'info');
+            Swal.close();
+
+            // เปิด PDF (LINE มักให้เลือกเปิดด้วยเบราว์เซอร์อื่น)
+            const newWindow = window.open(url, '_blank');
+            if (!newWindow) {
+                Swal.fire({
+                    title: 'เปิด PDF ไม่ได้อัตโนมัติ',
+                    text: 'กรุณากด "เปิดด้วยเบราว์เซอร์อื่น" ที่มุมขวาบนของ LINE หรือคัดลอกลิงก์แล้วเปิดใน Chrome',
+                    icon: 'info',
+                    confirmButtonText: 'ตกลง'
+                });
+            }
+
         } catch (e) {
+            console.error(e);
             btnGroup.style.display = 'grid';
-            Swal.fire('ผิดพลาด', 'ไม่สามารถสร้าง PDF ได้', 'error');
+            Swal.fire('ผิดพลาด', 'ไม่สามารถสร้าง PDF ได้ กรุณาลองใหม่', 'error');
         }
     }
 </script>
