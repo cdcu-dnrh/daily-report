@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สรุปรายงานการสอบสวนโรค++ (Daily Report)</title>
+    <title>สรุปรายงานการสอบสวนโรค (Daily Report)</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
@@ -13,7 +15,6 @@
             --primary: #2c3e50; 
             --accent: #3498db;
             --border: #cbd5e0;
-            --header-bg: #f8fafc;
         }
 
         * { box-sizing: border-box; }
@@ -23,98 +24,71 @@
             background-color: #f0f2f5; 
             display: flex; 
             justify-content: center; 
-            padding: 10px; 
+            padding: 15px; 
             margin: 0; 
         }
 
         .container { 
             background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
+            padding: 25px; 
+            border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
             width: 100%; 
             max-width: 800px; 
             border: 1px solid #e1e4e8; 
-            position: relative;
         }
 
         h3 { 
             color: #0c70d5; 
             text-align: center; 
             margin: 0 0 10px 0; 
-            font-size: 1.2rem; 
+            font-size: 1.3rem; 
             font-weight: 700; 
         }
 
         hr { border: 0; border-top: 2px solid var(--primary); margin-bottom: 20px; }
 
-        .date-picker-container { 
-            text-align: center; 
-            margin-bottom: 20px; 
-            padding-bottom: 15px;
-        }
+        .date-picker-container { text-align: center; margin-bottom: 20px; }
         .date-display { 
             font-size: 1.1rem; 
             font-weight: bold; 
             display: block; 
-            margin-bottom: 10px; 
-            color: #1a202c; }
+            margin-bottom: 8px; 
+            color: #1a202c; 
+        }
         
         input[type="date"] {
             font-family: 'Sarabun', sans-serif;
             padding: 8px;
             border: 1px solid var(--border);
-            border-radius: 4px;
+            border-radius: 6px;
             width: 100%;
-            max-width: 150px;
-            outline: none;            
+            max-width: 180px;
             text-align: center;
-            justify-content: center;
+            font-size: 1rem;
         }
 
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
         table { 
             width: 100%; 
             border-collapse: collapse; 
             margin-bottom: 20px; 
-            background: white;
-            min-width: 275px; 
             border: 1.5px solid #000;
         }
         th, td { 
             border: 1px dashed #000;
-            padding: 10px 8px; 
+            padding: 12px 8px; 
             font-size: 14px; 
-            line-height: 1.4;
         }
-        th { 
-            background-color: #c4e0f1;
-            text-align: center; 
-            font-weight: 700;
-        }
-        .cell-input { 
-            outline: none; 
-            transition: background 0.2s; 
-        }
-        .cell-input:focus { 
-            background: #fffdf2 !important; 
-        }
-        .cell-center { text-align: center; font-weight: bold; width: 80px; }
+        th { background-color: #c4e0f1; text-align: center; font-weight: 700; }
         
-        .summary-row { 
-            background-color: #f1f5f9;             
-            font-weight: bold; 
-        }
-
-        .total-lock {
-            background-color: #e2e8f0;
-            color: #000000;
-        }
+        .cell-input { outline: none; background: #fff; }
+        .cell-input:focus { background: #fffdf2; }
+        .cell-center { text-align: center; font-weight: bold; width: 100px; }
+        
+        .summary-row { background-color: #f1f5f9; font-weight: bold; }
+        .total-lock { background-color: #e2e8f0; color: #d32f2f; }
 
         .situation-container { margin-top: 20px; }
         .situation-container label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 16px; }
@@ -123,7 +97,6 @@
             min-height: 120px; 
             padding: 12px; 
             border: 1.5px dashed #000;
-            box-sizing: border-box; 
             white-space: pre-wrap; 
             outline: none;
             font-size: 15px;
@@ -139,8 +112,8 @@
         }
 
         .button-group { 
-            display: flex; 
-            flex-direction: column; 
+            display: grid; 
+            grid-template-columns: 1fr;
             gap: 10px; 
             margin-top: 25px; 
         }
@@ -153,18 +126,17 @@
             font-family: 'Sarabun', sans-serif; 
             font-size: 14px; 
             font-weight: bold; 
-            transition: 0.3s; 
-            text-align: center; 
             border: none; 
+            transition: 0.3s;
+            text-align: center;
         }
         .btn-print { background-color: #edf2f7; color: #2d3748; border: 1px solid #cbd5e0; }
         .btn-jpg { background-color: #2d3748; color: white; }
+        .btn-pdf { background-color: #e53e3e; color: white; }
 
         @media (min-width: 600px) {
             .container { padding: 40px; }
-            h3 { font-size: 20px; }
-            .button-group { flex-direction: row; }
-            .cell-center { width: 120px; }
+            .button-group { grid-template-columns: 1fr 1fr 1fr; }
         }
 
         @media print { 
@@ -172,7 +144,6 @@
             body { background: white; padding: 0; } 
             .container { box-shadow: none; border: none; width: 100%; max-width: 100%; } 
         }
-
     </style>
 </head>
 <body>
@@ -220,20 +191,16 @@
                     <td class="cell-input cell-center" contenteditable="true" inputmode="numeric" data-key="investigation"></td>
                 </tr>
                 <tr class="summary-row">
-                    <td><strong>สรุป จำนวนรายงานโรคประจำวัน </strong></td>
+                    <td><strong>สรุป จำนวนรายงานโรคประจำวัน (OPD+IPD)</strong></td>
                     <td class="cell-input cell-center total-lock" contenteditable="false" data-key="total">0</td>
                 </tr>
-
             </tbody>
         </table>
     </div>
 
     <div class="situation-container">
         <label>สรุปรายงานสถานการณ์ประจำวัน :</label>
-        <div class="editable-textarea cell-input" 
-            contenteditable="true" 
-            data-key="situation" 
-            placeholder="ระบุรายละเอียดสถานการณ์วันนี้..."></div>
+        <div class="editable-textarea cell-input" contenteditable="true" data-key="situation" placeholder="ระบุรายละเอียดสถานการณ์วันนี้..."></div>
     </div>
 
     <div class="footer-dept">
@@ -243,25 +210,21 @@
 
     <div class="button-group" id="btnGroup">
         <button type="button" class="btn btn-print" onclick="window.print()">พิมพ์รายงาน</button>
-        <button type="button" class="btn btn-jpg" onclick="downloadJPG()">บันทึกเป็นรูปภาพ (JPG)</button>
+        <button type="button" class="btn btn-jpg" onclick="downloadJPG()">บันทึกเป็น JPG</button>
+        <button type="button" class="btn btn-pdf" onclick="downloadPDF()">บันทึกเป็น PDF</button>
     </div>
-
 </div>
 
 <script>
+    const { jsPDF } = window.jspdf;
     const dateInput = document.getElementById('dateInput');
     const editableCells = document.querySelectorAll('.cell-input');
-    const firstCell = document.querySelector('[data-key="opd"]');
 
     window.onload = () => {
         const today = new Date().toISOString().split('T')[0];
         dateInput.value = today;
         updateThaiDate();
         loadData();
-        setTimeout(() => {
-            firstCell.focus();
-            selectText(firstCell);
-        }, 300);
     };
 
     function updateThaiDate() {
@@ -270,27 +233,15 @@
         document.getElementById('thaiDateDisplay').innerText = "ประจำวันที่ " + date.toLocaleDateString('th-TH', options);
     }
 
-    function selectText(element) {
-        if (!element.innerText.trim()) return;
-        const range = document.createRange();
-        range.selectNodeContents(element);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-
     function calculateTotal() {
-        const opdValue = parseInt(document.querySelector('[data-key="opd"]').innerText.replace(/,/g, '')) || 0;
-        const ipdValue = parseInt(document.querySelector('[data-key="ipd"]').innerText.replace(/,/g, '')) || 0;
-        const total = opdValue + ipdValue;
-        document.querySelector('[data-key="total"]').innerText = total;
+        const opd = parseInt(document.querySelector('[data-key="opd"]').innerText.replace(/,/g, '')) || 0;
+        const ipd = parseInt(document.querySelector('[data-key="ipd"]').innerText.replace(/,/g, '')) || 0;
+        document.querySelector('[data-key="total"]').innerText = (opd + ipd).toLocaleString();
     }
 
     function saveData() {
         const data = {};
-        editableCells.forEach(cell => {
-            data[cell.dataset.key] = cell.innerText;
-        });
+        editableCells.forEach(cell => data[cell.dataset.key] = cell.innerText);
         localStorage.setItem('report_data_' + dateInput.value, JSON.stringify(data));
     }
 
@@ -298,102 +249,81 @@
         const savedData = localStorage.getItem('report_data_' + dateInput.value);
         if (savedData) {
             const data = JSON.parse(savedData);
-            editableCells.forEach(cell => {
-                cell.innerText = data[cell.dataset.key] !== undefined ? data[cell.dataset.key] : "";
-            });
+            editableCells.forEach(cell => cell.innerText = data[cell.dataset.key] || "");
         } else {
             editableCells.forEach(cell => cell.innerText = "");
         }
         calculateTotal();
     }
 
-    dateInput.addEventListener('change', () => { 
-        updateThaiDate(); 
-        loadData(); 
-        setTimeout(() => {
-            firstCell.focus();
-            selectText(firstCell);
-        }, 100);
-    });
+    dateInput.addEventListener('change', () => { updateThaiDate(); loadData(); });
 
     editableCells.forEach(cell => {
-        cell.addEventListener('focus', () => {
-            setTimeout(() => selectText(cell), 10);
-        });
-
         cell.addEventListener('input', () => {
-            if (cell.dataset.key === 'opd' || cell.dataset.key === 'ipd') calculateTotal();
+            if (['opd', 'ipd'].includes(cell.dataset.key)) calculateTotal();
             saveData();
         });
-
-        cell.addEventListener('keydown', (e) => {
-            if (e.key === "Enter") {
-                if (!cell.classList.contains('editable-textarea')) {
-                    e.preventDefault();
-                    const cells = Array.from(document.querySelectorAll('.cell-center[contenteditable="true"]'));
-                    const index = cells.indexOf(cell);
-                    if (index < cells.length - 1) {
-                        cells[index + 1].focus();
-                    } else {
-                        document.querySelector('.editable-textarea').focus();
-                    }
-                }
-            }
-        });
     });
 
-    function downloadJPG() {
-    const btnGroup = document.getElementById('btnGroup');
-    const datePickerInput = document.getElementById('dateInput');
-    
-    // แสดง Loading
-    Swal.fire({
-        title: 'กำลังสร้างรูปภาพ...',
-        allowOutsideClick: false,
-        didOpen: () => { Swal.showLoading(); }
-    });
-
-    // ซ่อนปุ่มก่อนถ่ายรูป
-    btnGroup.style.display = 'none';
-    datePickerInput.style.display = 'none';
-
-    html2canvas(document.getElementById('reportContent'), { 
-        scale: 3, // เพิ่มความชัด
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+    // เตรียม Canvas ก่อนดาวน์โหลด
+    async function prepareCapture() {
+        Swal.fire({ title: 'กำลังประมวลผล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        document.getElementById('btnGroup').style.display = 'none';
+        dateInput.style.visibility = 'hidden'; // ซ่อนแต่รักษาระยะห่าง
         
-        // คืนค่าปุ่ม
-        btnGroup.style.display = 'flex';
-        datePickerInput.style.display = 'inline-block';
-        Swal.close();
+        const canvas = await html2canvas(document.getElementById('reportContent'), {
+            scale: 2,
+            backgroundColor: "#ffffff",
+            useCORS: true,
+            logging: false
+        });
 
-        // แก้ปัญหาบนมือถือ: ใช้การแสดงรูปเพื่อให้กดค้างบันทึกแทน
+        document.getElementById('btnGroup').style.display = 'flex';
+        dateInput.style.visibility = 'visible';
+        Swal.close();
+        return canvas;
+    }
+
+    // 1. บันทึกภาพ JPG ลงเครื่อง
+    async function downloadJPG() {
+        const canvas = await prepareCapture();
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        const fileName = `Report_${dateInput.value}.jpg`;
+
+        // ดาวน์โหลดอัตโนมัติ
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // แสดง Pop-up สำรองสำหรับมือถือ
         Swal.fire({
-            title: 'สร้างรูปภาพสำเร็จ',
-            html: `
-                <p style="font-size:14px; color:red;">* สำหรับมือถือ: กดค้างที่รูปด้านล่างแล้วเลือก "บันทึกรูปภาพ" *</p>
-                <img src="${imgData}" style="width:100%; border:1px solid #ccc; margin-top:10px;">
-            `,
-            confirmButtonText: 'ปิดหน้าต่างนี้',
+            title: 'ดาวน์โหลดรูปภาพแล้ว',
+            html: `<p style="font-size:13px; color:red;">* หากไฟล์ไม่เข้าเครื่องโดยอัตโนมัติ ให้กดค้างที่รูปภาพด้านล่างเพื่อบันทึก *</p>
+                   <img src="${imgData}" style="width:100%; border:1px solid #ddd; margin-top:10px;">`,
+            confirmButtonText: 'ปิด',
             confirmButtonColor: '#2d3748',
             width: '90%'
         });
-
-        }).catch(err => {
-        console.error(err);
-        btnGroup.style.display = 'flex';
-        datePickerInput.style.display = 'inline-block';
-        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถสร้างรูปภาพได้', 'error');
-        });
     }
 
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-        if (e.ctrlKey && (e.key === 'u' || e.key === 's' || (e.shiftKey && e.key === 'I')) || e.key === 'F12') e.preventDefault();
-    });
+    // 2. บันทึกไฟล์ PDF ลงเครื่อง
+    async function downloadPDF() {
+        const canvas = await prepareCapture();
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Report_${dateInput.value}.pdf`);
+        
+        Swal.fire('สำเร็จ', 'บันทึกไฟล์ PDF ลงเครื่องแล้ว', 'success');
+    }
 </script>
 
 </body>
